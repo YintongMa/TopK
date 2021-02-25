@@ -6,7 +6,7 @@ There is a 100 GB file of URLs on the disk. Please write a small project to calc
 
 Designed and implemented a variation of parallel external sorting to find TopK elements with O(M * N log R + N / R * D * 2) cost. 
 
-(M is one in-memory comparision cost; D is one-batch write to disk cost; R is the maximum record cnt in memory; N is total record cnt)
+(M is the cost for one in-memory comparision; D is the cost for one-batch write to disk; R is the maximum record cnt in memory; N is the total URL cnt)
 
 ### Stage 0 - Preparation
 1. Generate url distribution bars to partition the URL key space for merge workload balance.
