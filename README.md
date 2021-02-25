@@ -25,3 +25,39 @@ Designed and implemented a variation of parallel external sorting to find TopK e
 ### Stage 3 - Collect
 1. Merge each thread's TopK minheap into one final TopK minheap
 2. Output the final TopK minheap
+
+## Experiment
+Because of local PC limitation, this experiment will scale down both the file size and memory limitation.
+
+### Mock Dataset
+1. Run the URLFileGenerator.class to generate 4GB files to ./dataset by default. The user could also change the params to generate larger or smaller files.
+
+### Run TopK
+1. Build TopkURL jar with build.gradle to generate TopkURL-1.0-SNAPSHOT-all.jar in ./build/libs
+2. Run the folowing CMD, which will use 4 cpu cores and 40mb memory to parallelly find the top 10 URLs from 4GB url dataset in ./dataset. The maxlength of URL here is set to 50 characters.
+```
+java -Dk=10 -DsortParallelism=4 -DmergerParallelism=4 -DmergerParallelism=4 -DmemSize=40 -Durl_length=50 -Ddataset=./dataset -jar TopkURL-1.0-SNAPSHOT-all.jar
+
+```
+## Output Result
+```
+MemSorter finished, id 3
+MemSorter finished, id 0
+MemSorter finished, id 1
+MemSorter finished, id 2
+DiskMerger finished, id 0
+DiskMerger finished, id 2
+DiskMerger finished, id 1
+DiskMerger finished, id 3
+TopK Result Desc:
+http://kkkkkkkkkkkkkkkkkkkkkkkkkk=7154
+http://vvvvvvvvvvvvvvvvvvvvvvvvvv=7155
+http://nnnnnnnnnnnnnnnnnnnnnnnnnn=7156
+http://eeeeeeeeeeeeeeeeeeeeeeeeee=7183
+http://oooooooooooooooooooooooooo=7183
+http://bbbbbbbbbbbbbbbbbbbbbbbbbb=7217
+http://aaaaaaaaaaaaaaaaaaaaaaaaaa=7218
+http://ssssssssssssssssssssssssss=7222
+http://pppppppppppppppppppppppppp=7248
+http://xxxxxxxxxxxxxxxxxxxxxxxxxx=7284
+```
