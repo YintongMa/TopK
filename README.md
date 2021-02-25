@@ -33,7 +33,7 @@ Because of local PC limitation, this experiment will scale down both the file si
 1. Run the URLFileGenerator.class to generate 4GB files to ./dataset by default. The user could also change the params to generate larger or smaller files.
 
 ### Run TopK
-1. Build TopkURL jar with build.gradle to generate TopkURL-1.0-SNAPSHOT-all.jar in ./build/libs
+1. Build TopkURL jar with build.gradle's task buildTopK to generate TopkURL-1.0-SNAPSHOT-all.jar in ./build/libs
 2. Run the folowing CMD, which will use 4 cpu cores and 40mb memory to parallelly find the top 10 URLs from 4GB url dataset in ./dataset. The maxlength of URL here is set to 50 characters.
 ```
 java -Dk=10 -DsortParallelism=4 -DmergerParallelism=4 -DmergerParallelism=4 -DmemSize=40 -Durl_length=50 -Ddataset=./dataset -jar TopkURL-1.0-SNAPSHOT-all.jar
