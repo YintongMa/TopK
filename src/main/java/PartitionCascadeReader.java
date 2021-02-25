@@ -16,21 +16,12 @@ public class PartitionCascadeReader {
 
     public PartitionCascadeReader(List<String> partitions){
         this.partitions = partitions;
-        System.out.println("PartitionCascadeReader:"+partitions.size());
     }
 
-    public void open(){
-        try {
-            for(String partition: partitions){
-                readers.add(new BufferedReader(new FileReader(partition), bufferSize));
-            }
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+    public void open() throws FileNotFoundException {
+        for(String partition: partitions){
+            readers.add(new BufferedReader(new FileReader(partition), bufferSize));
         }
-
-
-
     }
 
     public boolean next(){

@@ -22,8 +22,22 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-./dataset
+## GRADLE
+# Ignore Gradle project-specific cache directory
+.gradle
 
-./topk_temp
+# Ignore Gradle build output directory
+build
+
+## INTELLIJ IDEA
+.idea/
+
+## MAC
+.DS_Store
+/bin/
+
+/dataset
+
+/topk_temp
 
 

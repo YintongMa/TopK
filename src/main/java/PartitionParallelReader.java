@@ -1,5 +1,3 @@
-import javafx.util.Pair;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -13,27 +11,22 @@ public class PartitionParallelReader {
     List<BufferedReader> readers = new ArrayList<>();
     int bufferSize = 1024;
     List<String> partitions;
-    Pair<String, Long>[] curkv ;
+    KVPair<String, Long>[] curkv ;
 
     public PartitionParallelReader(List<String> partitions, int bufferSize){
         this.partitions = partitions;
-        this.curkv = new Pair[partitions.size()];
-        this.bufferSize = bufferSize;
+        this.curkv = new KVPair[partitions.size()];
+        if (bufferSize > 0){
+            this.bufferSize = bufferSize;
+        }
+
     }
 
     public void open() throws IOException {
-        try {
-
-            for(int i = 0;i<partitions.size();i++){
-                this.readers.add(new BufferedReader(new FileReader(partitions.get(i)), bufferSize));
-                next(i);
-            }
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        for(int i = 0;i<partitions.size();i++){
+            this.readers.add(new BufferedReader(new FileReader(partitions.get(i)), bufferSize));
+            next(i);
         }
-
-
 
     }
 
@@ -41,7 +34,7 @@ public class PartitionParallelReader {
         String line = readers.get(i).readLine();
         if (line != null){
             String[] kv = line.split(",");
-            this.curkv[i] = new Pair<String, Long>(kv[0],Long.parseLong(kv[1]));
+            this.curkv[i] = new KVPair<String, Long>(kv[0],Long.parseLong(kv[1]));
             return true;
         }else{
             this.curkv[i] = null;
@@ -50,7 +43,7 @@ public class PartitionParallelReader {
     }
 
 
-    public Pair<String, Long> nextMinKV()  throws IOException {
+    public KVPair<String, Long> nextMinKV()  throws IOException {
         String minkey = null;
         //todo optimize double loop
         Long value = 0l;
@@ -68,7 +61,7 @@ public class PartitionParallelReader {
         }
 
         if(minkey != null){
-            return new Pair<String, Long>(minkey,value);
+            return new KVPair<String, Long>(minkey,value);
         }
 
         return null;

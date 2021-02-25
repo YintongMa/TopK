@@ -23,9 +23,8 @@ public class MemSorter implements Runnable{
         this.memSize = memSize;
         this.urlLength = urlLength;
         this.mergerParallelism = mergerParallelism;
-        this.recordLimit = memSize*1024/(urlLength + 8);
+        this.recordLimit = memSize*1024*1024/(urlLength + 8);
         this.tempFilePath = tempFilePath;
-        System.out.println("recordLimit:"+recordLimit);
     }
 
     public void buildSortedBlocks() throws IOException {
@@ -65,7 +64,6 @@ public class MemSorter implements Runnable{
         for (String key:map.keySet()){
             String line = key+","+map.get(key)+"\n";
             while(partition < mergerParallelism - 1 && key.compareTo(bars.get(partition)) > 0){
-                //System.out.println(key+","+bars.get(partition)+","+partition);
                 partition += 1;
             }
             fileWriters.get(partition).write(line);
@@ -78,22 +76,14 @@ public class MemSorter implements Runnable{
 
     }
 
-    static public void main(String[] args){
-//        try {
-//            MemSorter sorter = new MemSorter(0, new PartitionCascadeReader(0,"/Users/mayintong/Workspace/TopK/dataset"), new String[]{"aaa", "d","iuioi"}, 1, 50, 4);
-//            sorter.buildSortedBlocks();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-    }
 
     @Override
     public void run() {
         try {
             buildSortedBlocks();
-            System.out.println("MemSorter finished");
+            System.out.println("MemSorter finished, id "+id);
         } catch (IOException e) {
+            System.out.println("MemSorter error: "+e);
             e.printStackTrace();
         }
     }

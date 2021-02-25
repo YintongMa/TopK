@@ -1,4 +1,3 @@
-import javafx.util.Pair;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -9,19 +8,19 @@ import java.util.PriorityQueue;
 public class Util {
 
     static String[] alphabets = new String[]{"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"};
-    static public PriorityQueue<Pair<String, Long>> mergeMinHeaps(List<PriorityQueue<Pair<String, Long>>> minHeaps, int k){
-        PriorityQueue<Pair<String, Long>> minheap = minHeaps.get(0);
+    static public PriorityQueue<KVPair<String, Long>> mergeMinHeaps(List<PriorityQueue<KVPair<String, Long>>> minHeaps, int k){
+        PriorityQueue<KVPair<String, Long>> minheap = minHeaps.get(0);
 
         for(int i=1;i<minHeaps.size();i++){
-            PriorityQueue<Pair<String, Long>> heap = minHeaps.get(i);
+            PriorityQueue<KVPair<String, Long>> heap = minHeaps.get(i);
             while (heap.size() != 0){
-                Pair<String, Long> pair = heap.poll();
+                KVPair<String, Long> KVPair = heap.poll();
                 if (minheap.size() < k){
-                    minheap.add(pair);
+                    minheap.add(KVPair);
                 }else{
-                    if(pair.getValue() > minheap.peek().getValue()){
+                    if(KVPair.getValue() > minheap.peek().getValue()){
                         minheap.poll();
-                        minheap.add(pair);
+                        minheap.add(KVPair);
                     }
                 }
             }
@@ -29,20 +28,6 @@ public class Util {
         }
 
         return minheap;
-    }
-
-    public static ArrayList<String> getFiles(String path) {
-        ArrayList<String> files = new ArrayList<String>();
-        File file = new File(path);
-        File[] tempList = file.listFiles();
-        for (int i = 0; i < tempList.length; i++) {
-            if (tempList[i].isFile()) {
-                files.add(tempList[i].toString());
-            }
-            if (tempList[i].isDirectory()) {
-            }
-        }
-        return files;
     }
 
 
@@ -56,9 +41,7 @@ public class Util {
         for (int i = 0; i < tempList.length; i++) {
             if (tempList[i].isFile()) {
                 String fileName = tempList[i].toString();
-                System.out.println(FilenameUtils.getName(fileName));
                 int p = Integer.parseInt(FilenameUtils.getName(fileName).substring(prefix.length(),prefix.length()+1)) % totalPartitions;
-                System.out.println("p:"+p);
                 filesNamesByPartition.get(p).add(fileName);
             }
             if (tempList[i].isDirectory()) {

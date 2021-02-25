@@ -1,5 +1,3 @@
-
-import javafx.util.Pair;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -26,14 +24,24 @@ public class TopkURL {
         int memSize = 40; //mb
         int url_length = 50;
 
+        k = Integer.parseInt(System.getProperty("k"));
+        sortParallelism = Integer.parseInt(System.getProperty("sortParallelism"));
+        mergerParallelism = Integer.parseInt(System.getProperty("mergerParallelism"));
+        memSize = Integer.parseInt(System.getProperty("memSize"));
+        url_length = Integer.parseInt(System.getProperty("url_length"));
+        datasetPath = System.getProperty("dataset");
+
         ExecutorService sorterPool = Executors.newFixedThreadPool(sortParallelism);
         ExecutorService mergerPool = Executors.newFixedThreadPool(mergerParallelism);
-        //stage 1
+
+        //Stage 0 - Preparation
         File directory = new File(tempFilePath);
         if (! directory.exists()){
             directory.mkdir();
         }
         List<String> urlDistributionBars = Util.getUrlDistributionBars(mergerParallelism);
+
+        //Stage 1 - Sort
         List<List<String>> inputFileByPartition = Util.getFilesNamesByPartition(sortParallelism,"",datasetPath);
         for(int i = 0;i < sortParallelism; i++){
             sorterPool.submit(
@@ -48,23 +56,25 @@ public class TopkURL {
         sorterPool.shutdown();
         sorterPool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
-        //stage 2
+        //Stage 2 - Merge
         List<List<String>> filesNamesByPartition = Util.getFilesNamesByPartition(mergerParallelism,tempFilePrefix,tempFilePath);
         DiskMerger[] mergers = new DiskMerger[mergerParallelism];
         for(int i = 0;i < mergerParallelism; i++){
             List<String> partitions = filesNamesByPartition.get(i);
-            mergers[i] = new DiskMerger(new PartitionParallelReader(partitions,memSize*1024/mergerParallelism/partitions.size()/2), k);
+            mergers[i] = new DiskMerger(i,new PartitionParallelReader(partitions,memSize*1024/mergerParallelism/partitions.size()/2), k);
             mergerPool.submit(mergers[i]);
         }
         mergerPool.shutdown();
         mergerPool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
-        //stage 3
-        List<PriorityQueue<Pair<String, Long>>> minHeaps = new ArrayList<>();
+        //Stage 3 - Collect
+        List<PriorityQueue<KVPair<String, Long>>> minHeaps = new ArrayList<>();
         for(DiskMerger merger: mergers){
             minHeaps.add(merger.getMinheap());
         }
-        PriorityQueue<Pair<String, Long>> topk = Util.mergeMinHeaps(minHeaps,k);
+        PriorityQueue<KVPair<String, Long>> topk = Util.mergeMinHeaps(minHeaps,k);
+
+        System.out.println("TopK Result Desc:");
         while (!topk.isEmpty()){
             System.out.println(topk.poll());
         }
